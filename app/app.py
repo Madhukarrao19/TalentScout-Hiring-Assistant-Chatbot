@@ -14,9 +14,9 @@ def conversation_flow():
 
     st.write("Here are some questions based on your tech stack:")
     responses = []
-    for question in questions:
+    for i, question in enumerate(questions):
         st.write(question)
-        response = st.text_input("Response:")
+        response = st.text_input("Response:", key=f"response_{i}")
         responses.append(response)
 
     st.write("Here are your responses:")
