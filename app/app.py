@@ -1,14 +1,10 @@
 import streamlit as st
-import pkg_resources
-
-print("Torch version:", pkg_resources.get_distribution('torch').version)
+import importlib.metadata
 
 st.title("TalentScout Hiring Assistant Chatbox")
 st.write("Welcome to the TalentScout Hiring Assistant Chatbox!")
 
 def conversation_flow():
-    st.title("TalentScout Hiring Assistant Chatbox")
-    st.write("Welcome to the TalentScout Hiring Assistant Chatbox!")
     st.write("Please enter your name and tech stack to get started.")
 
     name = st.text_input("Name:")
@@ -17,12 +13,10 @@ def conversation_flow():
     questions = generate_questions(tech_stack)
 
     st.write("Here are some questions based on your tech stack:")
-    for question in questions:
-        st.write(question)
-
     responses = []
     for question in questions:
-        response = st.text_input(question)
+        st.write(question)
+        response = st.text_input("Response:")
         responses.append(response)
 
     st.write("Here are your responses:")
