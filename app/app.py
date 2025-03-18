@@ -1,4 +1,10 @@
 import streamlit as st
+import subprocess
+import sys
+
+# Install the nltk library
+subprocess.check_call([sys.executable, "-m", "pip", "install", "nltk"])
+
 import nltk
 from nltk.tokenize import word_tokenize
 
