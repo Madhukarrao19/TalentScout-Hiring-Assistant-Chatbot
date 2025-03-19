@@ -1,52 +1,71 @@
 import streamlit as st
-import nltk
-from nltk.tokenize import word_tokenize
+from transformers import pipeline
+
+# Load Hugging Face pipeline for Named Entity Recognition (NER)
+ner_pipeline = pipeline("ner", model="dslim/bert-base-NER")
+
+# Function to extract named entities (useful for tech stacks, names, etc.)
+def extract_entities(text):
+    entities = ner_pipeline(text)
+    extracted_info = {entity['entity']: entity['word'] for entity in entities}
+    return extracted_info
 
 # Define the chatbot's conversation flow
 def conversation_flow():
-    st.title("Hiring Assistant Chatbot")
-    st.write("Welcome to the Hiring Assistant Chatbot!")
+    st.title("TalentScout Hiring Assistant Chatbot 🤖")
+    st.write("Welcome! I will assist you with job screening and tech assessment.")
 
     # Gather initial candidate information
-    name = st.text_input("Name:")
-    email = st.text_input("Email:")
-    phone = st.text_input("Phone:")
+    name = st.text_input("Full Name:")
+    email = st.text_input("Email Address:")
+    phone = st.text_input("Phone Number:")
     experience = st.text_input("Years of Experience:")
     position = st.text_input("Desired Position:")
     location = st.text_input("Current Location:")
-    tech_stack = st.text_input("Tech Stack:")
+    tech_stack = st.text_input("Tech Stack (e.g., Python, Java, React):")
 
+    # Extract structured info from input (Optional Enhancement)
+    structured_data = extract_entities(tech_stack)
+    
     # Generate technical questions based on the candidate's tech stack
     questions = generate_questions(tech_stack)
 
     # Display the questions to the candidate
-    st.write("Here are some questions based on your tech stack:")
+    st.write("Here are some technical questions based on your tech stack:")
     responses = []
     for i, question in enumerate(questions):
-        st.write(question)
-        response = st.text_input("Response:", key=f"response_{i}")
+        st.write(f"**{i+1}. {question}**")
+        response = st.text_input("Your Response:", key=f"response_{i}")
         responses.append(response)
 
-    # Display the candidate's responses
-    st.write("Here are your responses:")
-    for response in responses:
-        st.write(response)
+    # Display candidate responses
+    st.write("**Your responses:**")
+    for i, response in enumerate(responses):
+        st.write(f"**Q{i+1}:** {questions[i]}")
+        st.write(f"**A:** {response}")
 
-    # Fallback Mechanism
+    # Fallback & End conversation options
     if st.button("I don't understand"):
-        st.write("Sorry, I didn't quite get that. Can you please rephrase your question or provide more context?")
+        st.write("Sorry, I didn’t quite get that. Can you rephrase?")
 
-    # End Conversation
     if st.button("End Conversation"):
-        st.write("Thank you for chatting with me! We will review your responses and get back to you soon. Have a great day!")
+        st.write("Thank you for chatting! We will review your responses and contact you soon.")
 
-# Define the function to generate technical questions
+# Function to generate technical questions based on tech stack
 def generate_questions(tech_stack):
-    # Use a simple question generation algorithm
-    questions = ["What is your experience with " + tech_stack + "?",
-                 "How do you stay up-to-date with the latest developments in " + tech_stack + "?",
-                 "Can you give an example of a project you worked on that involved " + tech_stack + "?"]
-    return questions
+    if not tech_stack:
+        return ["Please enter your tech stack to generate relevant questions."]
+    
+    tech_list = tech_stack.split(",")  # Convert tech stack input into a list
+    questions = []
+    
+    for tech in tech_list:
+        tech = tech.strip()  # Remove unnecessary spaces
+        questions.append(f"What is your experience with {tech}?")
+        questions.append(f"How do you stay up-to-date with the latest in {tech}?")
+        questions.append(f"Can you give an example of a project you worked on using {tech}?")
+    
+    return questions[:5]  # Limit to 5 questions for brevity
 
-# Run the conversation flow
+# Run the chatbot
 conversation_flow()
